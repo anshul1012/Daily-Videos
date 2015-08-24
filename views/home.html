@@ -1,0 +1,4 @@
+<h3>Hello {{user.getBasicProfile().getName()}}</h3><h3 style="float:right;" ng-click="signOut()">SignOut</h3>
+<div ng-repeat="video in videos">
+    <img ng-src="{{video.img_src}}" alt width="392" height="220" ng-click="playVideo($index)"/>
+</div>

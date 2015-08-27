@@ -1,4 +1,19 @@
-<h3>Hello {{user.getBasicProfile().getName()}}</h3><h3 style="float:right;" ng-click="signOut()">SignOut</h3>
-<div ng-repeat="video in videos">
+<h3>Hello {{user.getBasicProfile().getName()}}<a href="" style="float:right;" ng-click="signOut()">SignOut</a></h3>
+<!--<div ng-repeat="video in videos">
     <img ng-src="{{video.img_src}}" alt width="392" height="220" ng-click="playVideo($index)"/>
+</div>-->
+
+<!--<div ng-repeat="subscription in subscriptions">
+    <p>{{subscription.title}}</p>
+</div>-->
+
+
+<select name="selectSubs" ng-model = "selectedChannel">
+    <option ng-repeat = "channel in subscriptions" value="{{channel.channelId}}">{{channel.title}}</option>
+</select>
+
+<div ng-repeat="video in videos">
+    <img ng-src="{{video.thumbnail}}" alt width="392" height="220" ng-click="playVideo($index)"/>
+    <h4>{{video.title}}</h4>
 </div>
+

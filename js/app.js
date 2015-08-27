@@ -16,6 +16,10 @@ app.config(['$routeProvider', function($routeProvider){
             templateUrl: 'views/player.html',
             controller: 'PlayerController'
         }).
+        when('/logout',{
+            templateUrl: 'views/logout.html',
+            controller: 'LogoutController'
+        }).
         otherwise({
             redirectTo: '/login'
         });

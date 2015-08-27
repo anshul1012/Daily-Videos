@@ -2,7 +2,6 @@
  * Created by achaturvedi on 8/20/2015.
  */
 app.factory('LoggedUser', ['$window','$q', function($window,$q){
-    console.log("executing");
     var apistatusPromise = $q.defer();
     var signInPromise = $q.defer();
     var user = undefined;
@@ -22,7 +21,6 @@ app.factory('LoggedUser', ['$window','$q', function($window,$q){
     };
     $window.onLoad = function(){
         apiStatus = true;
-        console.log("apistatus :"+apiStatus);
         apistatusPromise.resolve(true);
     };
 

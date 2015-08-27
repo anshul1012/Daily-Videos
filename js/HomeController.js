@@ -1,45 +1,58 @@
 /**
  * Created by achaturvedi on 8/18/2015.
  */
-app.controller('HomeController', ['$scope','$location','videoList','LoggedUser','$route', function($scope,$location,videoList,LoggedUser,$route){
+app.controller('HomeController', ['$scope','$location','LoggedUser','YoutubeDataService', function($scope,$location,LoggedUser,YoutubeDataService){
     console.log("generating home page");
     $scope.user = LoggedUser.getLoggedUser();
     if(typeof $scope.user === 'undefined') {
         console.log("You have not logged in... redirectin to login");
         $location.path('/login');
+        $scope.$apply();
     }
 
     $scope.signOut = function(){
-        //console.log(gapi.auth2.GoogleAuth);
+
         gapi.auth2.getAuthInstance().signOut().then(function(){
-            console.log(gapi.auth2.getAuthInstance());
-            $scope.user = undefined;
-            $location.path('/login');
-            console.log($location.path());
+            LoggedUser.setLoggedUser(undefined);
+            $location.path('/logout');
             $scope.$apply();
         });
     };
 
-    /*gapi.auth2.getAuthInstance().isSignedIn.listen(function(isLoggedIn){
-        console.log("signing out");
-        console.log(isLoggedIn);
-        if(!isLoggedIn){
-            $scope.user = undefined;
-            $location.path('/login');
-            $scope.$apply();
-        }
-    });*/
+    $scope.subscriptions=[];
+    $scope.videos =[];
+    $scope.selectedChannel = "Choose channel";
+    YoutubeDataService.setAccessToken($scope.user.getAuthResponse(1).access_token);
+    YoutubeDataService.getSubscriptions().then(function(data){
+        $scope.subscriptions = data;
+    });
 
-    var myVideos = videoList;
+    $scope.$watch(function($scope){
+        return $scope.selectedChannel;
+    },function(){
+        $scope.subscriptions.filter(function(sub){return sub.channelId==$scope.selectedChannel})[0] = YoutubeDataService.getVideos($scope.selectedChannel).then(function(videos){
+            $scope.videos = videos;
+        });
+    });
+
+    /*YoutubeDataService.setAccessToken($scope.user.getAuthResponse(1).access_token);
+    $scope.userSubscriptions = YoutubeDataService.getSubscriptions();*/
+
+
+
+    /*//var myVideos = videoList;
+    var videos=videoList.videos;
+    //console.log(videos[0]);
     $scope.videos=[];
-    for(var i=0; i<myVideos.length; i++){
+    for(var i=0; i<videos.length; i++){
         $scope.videos[i] = {
-            img_src: 'http://img.youtube.com/vi/'+myVideos[i]+'/hqdefault.jpg',
-            url: 'http://youtube.com/watch?v='+myVideos[i],
-            id: myVideos[i]
+            img_src: 'http://img.youtube.com/vi/'+videos[i]+'/hqdefault.jpg',
+            url: 'http://youtube.com/watch?v='+videos[i],
+            id: videos[i]
         };
-        //console.log($scope.videos);
+        //console.log($scope.videos[i]);
     }
+    //console.log($scope.videos);*/
 
     $scope.playVideo = function(index){
         $location.path('/play/'+$scope.videos[index].id);

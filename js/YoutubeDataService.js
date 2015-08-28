@@ -12,8 +12,8 @@ app.factory('YoutubeDataService', ['$http','$q',function($http,$q){
     var subscriptions = [];
     var videos = [];
     var i=0;
-    var subscriptionPromise = $q.defer();
-    var videoListPromise = $q.defer();
+    var subscriptionPromise;
+    var videoListPromise;
 
     var fetchSubscriptions = function(result){
         angular.forEach(result.data.items, function(value,key){
@@ -30,7 +30,6 @@ app.factory('YoutubeDataService', ['$http','$q',function($http,$q){
             });
         }
         else{
-            console.log("returning subscriptions");
             subscriptionPromise.resolve(subscriptions);
             subscriptions = [];
             i=0;
@@ -58,7 +57,7 @@ app.factory('YoutubeDataService', ['$http','$q',function($http,$q){
             });
         }
         else{
-            console.log("returning videos");
+
             videoListPromise.resolve(videos);
             videos = [];
             i=0;
@@ -71,19 +70,23 @@ app.factory('YoutubeDataService', ['$http','$q',function($http,$q){
         });
     };
 
+    var uploadList = function(channelId){
+        videoListPromise = $q.defer();
+        $http.get("https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id="+channelId+"&fields=items(contentDetails(relatedPlaylists(uploads)))&key="+apikey).then(function(response){
+            var listId = response.data.items[0].contentDetails.relatedPlaylists.uploads;
+            getVideos(listId);
+        });
+        console.log(videoListPromise.promise);
+        return videoListPromise.promise;
+    }
 
     return {
         setAccessToken: setAccessToken,
         getSubscriptions: function(){
+            subscriptionPromise = $q.defer();
             getSubscriptions();
             return subscriptionPromise.promise;
         },
-        getVideos: function(channelId){
-            $http.get("https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id="+channelId+"&fields=items(contentDetails(relatedPlaylists(uploads)))&key="+apikey).then(function(response){
-                var listId = response.data.items[0].contentDetails.relatedPlaylists.uploads;
-                getVideos(listId);
-            });
-            return videoListPromise.promise;
-        }
+        getVideoList: uploadList
     };
 }]);

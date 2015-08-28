@@ -3,6 +3,7 @@
  */
 app.controller('HomeController', ['$scope','$location','LoggedUser','YoutubeDataService', function($scope,$location,LoggedUser,YoutubeDataService){
     console.log("generating home page");
+    var initial = 1;
     $scope.user = LoggedUser.getLoggedUser();
     if(typeof $scope.user === 'undefined') {
         console.log("You have not logged in... redirectin to login");
@@ -21,18 +22,24 @@ app.controller('HomeController', ['$scope','$location','LoggedUser','YoutubeData
 
     $scope.subscriptions=[];
     $scope.videos =[];
-    $scope.selectedChannel = "Choose channel";
+    $scope.selectedChannel = "";
     YoutubeDataService.setAccessToken($scope.user.getAuthResponse(1).access_token);
     YoutubeDataService.getSubscriptions().then(function(data){
         $scope.subscriptions = data;
     });
 
-    $scope.$watch(function($scope){
-        return $scope.selectedChannel;
-    },function(){
-        $scope.subscriptions.filter(function(sub){return sub.channelId==$scope.selectedChannel})[0] = YoutubeDataService.getVideos($scope.selectedChannel).then(function(videos){
-            $scope.videos = videos;
-        });
+    $scope.$watch('selectedChannel', function(newval,oldval){
+        if(initial){
+            initial = 0;
+        }
+        else{
+            YoutubeDataService.getVideoList(newval).then(function(response){
+                //$scope.subscriptions.filter(function(sub){return sub.channelId==$scope.selectedChannel})[0].videos = videos;
+                $scope.videos = response;
+
+            });
+        }
+
     });
 
     /*YoutubeDataService.setAccessToken($scope.user.getAuthResponse(1).access_token);

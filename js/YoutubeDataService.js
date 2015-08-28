@@ -76,7 +76,6 @@ app.factory('YoutubeDataService', ['$http','$q',function($http,$q){
             var listId = response.data.items[0].contentDetails.relatedPlaylists.uploads;
             getVideos(listId);
         });
-        console.log(videoListPromise.promise);
         return videoListPromise.promise;
     }
 
